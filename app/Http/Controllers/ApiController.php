@@ -2,28 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateStudantRequest;
 use App\Models\Student;
 use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
     // Metodo get que retorna a listagem de estudantes na API
-    public function getAllStudentes ()
+    public function getAllStudentes()
     {
         $studant = Student::all();
 
         if (!empty($studant)) {
-            return response()->json($studant,201);
+            return response()->json($studant, 201);
         }
     }
 
     // Metodo post para realizar a criação do estudante na API
-    public function createStudant (Request $request)
+    public function createStudant(CreateStudantRequest $request)
     {
-        $nome       = $request->input('name');
-        $last_name  = $request->input('last_name');
-        $email      = $request->input('email');
-        $profession = $request->input('profession');
+        $email = $request->input('email');
 
         $consultUser = Student::where('email', $email)->count();
 
@@ -32,10 +30,10 @@ class ApiController extends Controller
         }
 
         $createStudant = Student::insert([
-            'name'       => $nome,
-            'last_name'  => $last_name,
-            'email'      => $email,
-            'profession' => $profession
+            'name' => $request->input('name'),
+            'last_name' => $request->input('last_name'),
+            'email' => $request->input('email'),
+            'profession' => $request->input('profession')
         ]);
 
         if ($createStudant) {
@@ -46,7 +44,7 @@ class ApiController extends Controller
     }
 
     // Metodo get para retornar um unico estudante na API
-    public function getStudant ($id)
+    public function getStudant($id)
     {
         $studant = Student::where('id', $id)->first();
 
@@ -58,41 +56,36 @@ class ApiController extends Controller
     }
 
     // Metodo put para realizar a atualização de um estudante na API
-    public function updateStudant (Request $request, $id)
+    public function updateStudant(CreateStudantRequest $request, $id)
     {
-        $nome       = $request->input('name');
-        $last_name  = $request->input('last_name');
-        $email      = $request->input('email');
-        $profession = $request->input('profession');
-
         $updateStudant = Student::where('id', $id)->update([
-            'name'       => $nome,
-            'last_name'  => $last_name,
-            'email'      => $email,
-            'profession' => $profession
+            'name' => $request->input('name'),
+            'last_name' => $request->input('last_name'),
+            'email' => $request->input('email'),
+            'profession' => $request->input('profession')
         ]);
 
         if ($updateStudant) {
             return response()->json([$updateStudant, 200]);
         } else {
-            return response()->json(['message' => 'Não foi possível realizar a alteração'], 500);
+            return response()->json(['message' => 'Não foi possível realizar a alteração'],500);
         }
     }
 
     // Metodo delete para realizar a exclusão de um estudante
-    public function deleteStudant ($id)
+    public function deleteStudant($id)
     {
-        if(Student::where('id', $id)->exists()) {
+        if (Student::where('id', $id)->exists()) {
             $student = Student::find($id);
             $student->delete();
 
             return response()->json([
                 "message" => "Estudante deletado"
-            ], 202);
+            ],202);
         } else {
             return response()->json([
                 "message" => "Estudante não deletado"
-            ], 404);
+            ],404);
         }
     }
 }
